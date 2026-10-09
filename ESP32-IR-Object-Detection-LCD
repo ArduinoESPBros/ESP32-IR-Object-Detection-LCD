@@ -1,0 +1,58 @@
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+// LCD configuration
+#define LCD_ADDRESS 0x27
+#define LCD_COLUMNS 16
+#define LCD_ROWS 2
+
+// Pin configuration
+#define IR_SENSOR_PIN 27
+#define LCD_SDA_PIN 21
+#define LCD_SCL_PIN 22
+
+LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLUMNS, LCD_ROWS);
+
+void setup() {
+  Serial.begin(115200);
+
+  // Initialize I2C for ESP32
+  Wire.begin(LCD_SDA_PIN, LCD_SCL_PIN);
+
+  // Initialize LCD
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+
+  // Initialize IR sensor
+  pinMode(IR_SENSOR_PIN, INPUT);
+
+  lcd.setCursor(0, 0);
+  lcd.print("Object Detector");
+  lcd.setCursor(0, 1);
+  lcd.print("Initializing...");
+
+  delay(2000);
+  lcd.clear();
+
+  Serial.println("ESP32 Object Detection Started");
+}
+
+void loop() {
+  int sensorState = digitalRead(IR_SENSOR_PIN);
+
+  lcd.setCursor(0, 0);
+  lcd.print("IR Object Status");
+
+  lcd.setCursor(0, 1);
+
+  if (sensorState == LOW) {
+    lcd.print("Object Detected ");
+    Serial.println("Object Detected!");
+  } else {
+    lcd.print("No Object       ");
+    Serial.println("No Object Detected");
+  }
+
+  delay(300);
+}
